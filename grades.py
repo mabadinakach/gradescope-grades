@@ -3,21 +3,43 @@ from bs4 import BeautifulSoup
 import mechanize
 import pandas as pd
 import getpass
+import keyring
 
-print("Please enter your Gradescope email and password to continue:")
-print()
+
+
 
 br = mechanize.Browser()
 br.open("https://www.gradescope.com/login")
 br.select_form(nr=0)
-br.form['session[email]'] = input("Email: ") # Change this to your actual email so it remembers it. Ex. "firstname.lastname@students.makeschool.com"
-br.form['session[password]'] = getpass.getpass("Password: ") # Change this to your password so it remembers it. Ex. "password"
+
+if keyring.get_password("system", "gradescope") and keyring.get_password("system", "gradescope-email") is not None:
+    br.form['session[email]'] = keyring.get_password("system", "gradescope-email")
+    br.form['session[password]'] = keyring.get_password("system", "gradescope")
+else:
+    print("Please enter your Gradescope email and password to continue:")
+    print()
+    email = input("Email: ")
+    password = getpass.getpass("Password: ")
+    save = input("Save email and password? y/n: ")
+    if save == "y" or save == "Y":
+        keyring.set_password("system", "gradescope-email", email)
+        keyring.set_password("system", "gradescope", password)
+    else:
+        pass
+    br.form['session[email]'] = keyring.get_password("system", "gradescope-email")
+    br.form['session[password]'] = keyring.get_password("system", "gradescope")
+
+ 
 req = br.submit()
 soup = BeautifulSoup(br.response().read(), features="html5lib")
 error = soup.find("div", class_="alert alert-flashMessage alert-error")
 
+
+
 if error is not None:
     print("Invalid email/password combination. Please try again")
+    keyring.delete_password("system", "gradescope")
+    keyring.delete_password("system", "gradescope-email")
 else: 
     names = soup.find_all("h3", class_="courseBox--shortname")
     clases = dict()
