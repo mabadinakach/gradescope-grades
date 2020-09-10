@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import mechanize
 import pandas as pd
+import getpass
 
 print("Please enter your Gradescope email and password to continue:")
 print()
@@ -10,7 +11,7 @@ br = mechanize.Browser()
 br.open("https://www.gradescope.com/login")
 br.select_form(nr=0)
 br.form['session[email]'] = input("Email: ") # Change this to your actual email so it remembers it. Ex. "firstname.lastname@students.makeschool.com"
-br.form['session[password]'] = input("Password: ") # Change this to your password so it remembers it. Ex. "password"
+br.form['session[password]'] = getpass.getpass("Password: ") # Change this to your password so it remembers it. Ex. "password"
 req = br.submit()
 soup = BeautifulSoup(br.response().read(), features="html5lib")
 error = soup.find("div", class_="alert alert-flashMessage alert-error")
