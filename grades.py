@@ -5,9 +5,6 @@ import pandas as pd
 import getpass
 import keyring
 
-
-
-
 br = mechanize.Browser()
 br.open("https://www.gradescope.com/login")
 br.select_form(nr=0)
@@ -59,6 +56,8 @@ else:
         br.open("https://www.gradescope.com" + clases[class_])
         soup = BeautifulSoup(br.response().read(), features="html5lib")
         score = soup.find_all("div", class_="submissionStatus--score")
+        average = 0
+        num = 0
         for tr in soup.find_all("tr"):
             grade = tr.find("div", class_="submissionStatus--score")
             if grade is not None:
@@ -67,12 +66,28 @@ else:
                     grades[class_].update({assignment.text:grade.text})
                 except KeyError:
                     grades[class_] = {assignment.text:grade.text}
+                numero = ""
+                segundo_numero = ""
+                primer_numero = ""
+                for i in grade.text.replace(".",""):
+                    try:
+                        int(i)
+                        segundo_numero = segundo_numero + i
+                    except ValueError:
+                        numero = segundo_numero
+                        if numero != "":
+                            primer_numero = segundo_numero
+                        segundo_numero = ""
+                scores = int(primer_numero) / int(segundo_numero)*100
+                average += scores
+                num += 1
+        
         file1.write(f"{class_}\n")
         df = pd.DataFrame(grades[class_].items(), columns=["assignment", "score"])
-        print(class_)
+        print(f"{class_}\nGrade: {round(average/num,2)}")
         print()
         print(df)
-        print()
+        print()        
         file1.write(f"{df.to_string()}\n")
         file1.write("\n")
         
