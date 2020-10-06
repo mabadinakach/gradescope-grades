@@ -4,6 +4,7 @@ import mechanize
 import pandas as pd
 import getpass
 import keyring
+from datetime import date
 
 br = mechanize.Browser()
 br.open("https://www.gradescope.com/login")
@@ -42,7 +43,7 @@ else:
     clases = dict()
     grades = {}
 
-    file1 = open("grades.txt","w")
+    file1 = open("report.txt","w")
 
     for a in soup.find_all('a', href=True):
         h3 = a.find_all('h3', class_="courseBox--shortname")
@@ -52,6 +53,8 @@ else:
 
     print("Grades:")
     print()
+    file1.write(f"Grade report {str(date.today())}")
+    file1.write("\n")
     for class_ in clases:
         br.open("https://www.gradescope.com" + clases[class_])
         soup = BeautifulSoup(br.response().read(), features="html5lib")
@@ -82,16 +85,26 @@ else:
                 average += scores
                 num += 1
         
-        file1.write(f"{class_}\n")
-        df = pd.DataFrame(grades[class_].items(), columns=["assignment", "score"])
-        print(f"{class_}\nGrade: {round(average/num,2)}")
-        print()
-        print(df)
-        print()        
-        file1.write(f"{df.to_string()}\n")
-        file1.write("\n")
+        try:
+            df = pd.DataFrame(grades[class_].items(), columns=["assignment", "score"])
+            classGrade = int(average/num)
+            file1.write("\n")
+            file1.write(f"{class_}\nGrade: {classGrade}")
+            file1.write("\n")
+            print(f"{class_}\nGrade: {classGrade}")
+            print()
+            print(df)
+            print()        
+            file1.write(f"{df.to_string()}\n")
+            file1.write("\n")
+        except KeyError:
+            file1.write("\n")
+            file1.write(f"{class_}\nNothing graded yet...")
+            file1.write("\n")
+            print(class_)
+            print()
+            print("Nothing graded yet...")
+            print()
+            file1.write("\n")
         
     file1.close()
-
-
-    
