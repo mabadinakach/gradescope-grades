@@ -1,4 +1,4 @@
-Grade report 2020-10-06
+Grade report 2020-10-12
 
 CS 1.1
 Grade: 95
@@ -10,17 +10,21 @@ Grade: 95
 
 INT 1.1
 Nothing graded yet...
+Missing assignments: Proposal · Github
 
 
 WEB 1.0
-Grade: 88
-                          assignment      score
-0            Portfolio Part 1 (HTML)  9.0 / 9.0
-1              Learn Semantic Markup  2.5 / 3.0
-2  Learn Markup Attributes (Level 2)  0.9 / 1.0
-3  Assignment 4.1 - CSS Challenges 1  3.0 / 3.0
-4  Assignment 4.2 - CSS Challenges 2  2.0 / 2.0
-5     Assignment 4.3 - CSS Portfolio  6.0 / 9.0
-6                   Single Page Site  6.0 / 9.0
-7                     Tip Calculator  4.0 / 4.0
+Grade: 91
+                           assignment      score
+0             Portfolio Part 1 (HTML)  9.0 / 9.0
+1               Learn Semantic Markup  2.5 / 3.0
+2   Learn Markup Attributes (Level 2)  0.9 / 1.0
+3   Assignment 4.1 - CSS Challenges 1  3.0 / 3.0
+4   Assignment 4.2 - CSS Challenges 2  2.0 / 2.0
+5      Assignment 4.3 - CSS Portfolio  6.0 / 9.0
+6                    Single Page Site  6.0 / 9.0
+7                      Tip Calculator  4.0 / 4.0
+8       Mood Shop Tutorial Parts 1-12  3.0 / 3.0
+9                   Custom Calculator  4.0 / 4.0
+10                   Final Assessment  3.0 / 3.0
 

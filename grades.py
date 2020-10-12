@@ -6,13 +6,29 @@ import getpass
 import keyring
 from datetime import date
 
+class bcolors:
+    HEADER = '\033[44m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 br = mechanize.Browser()
 br.open("https://www.gradescope.com/login")
 br.select_form(nr=0)
 
-if keyring.get_password("system", "gradescope") and keyring.get_password("system", "gradescope-email") is not None:
-    br.form['session[email]'] = keyring.get_password("system", "gradescope-email")
-    br.form['session[password]'] = keyring.get_password("system", "gradescope")
+email = keyring.get_password("system", "gradescope-email")
+pswd = keyring.get_password("system", "gradescope")
+
+if email and pswd is not None:
+    
+    print(f"Logging in with: {email}")
+    print("")
+    br.form['session[email]'] = email
+    br.form['session[password]'] = pswd
 else:
     print("Please enter your Gradescope email and password to continue:")
     print()
@@ -38,10 +54,11 @@ if error is not None:
     print("Invalid email/password combination. Please try again")
     keyring.delete_password("system", "gradescope")
     keyring.delete_password("system", "gradescope-email")
-else: 
+else:    
     names = soup.find_all("h3", class_="courseBox--shortname")
     clases = dict()
     grades = {}
+    missingAssignments = []
 
     file1 = open("report.txt","w")
 
@@ -51,8 +68,6 @@ else:
             for name in h3:
                 clases[str(name.text)] = a["href"]
 
-    print("Grades:")
-    print()
     file1.write(f"Grade report {str(date.today())}")
     file1.write("\n")
     for class_ in clases:
@@ -61,8 +76,14 @@ else:
         score = soup.find_all("div", class_="submissionStatus--score")
         average = 0
         num = 0
+        missingAssignments = []
         for tr in soup.find_all("tr"):
             grade = tr.find("div", class_="submissionStatus--score")
+            work = tr.find("div", class_="submissionStatus--text")
+            if work is not None:
+                if work.text == "No Submission":
+                    a = tr.find("a")
+                    missingAssignments.append(a.text)
             if grade is not None:
                 assignment = tr.find("a")
                 try:
@@ -84,15 +105,20 @@ else:
                 scores = int(primer_numero) / int(segundo_numero)*100
                 average += scores
                 num += 1
-        
+        missingAssignmentsLine = bcolors.FAIL + "  - " +  '\n  - '.join(missingAssignments) + bcolors.ENDC
+        classLine =  bcolors.HEADER  + "     " + class_ + "     " + bcolors.ENDC  + "\n"
         try:
             df = pd.DataFrame(grades[class_].items(), columns=["assignment", "score"])
             classGrade = int(average/num)
             file1.write("\n")
             file1.write(f"{class_}\nGrade: {classGrade}")
             file1.write("\n")
-            print(f"{class_}\nGrade: {classGrade}")
+            print(f"{classLine}\nGrade: {bcolors.OKGREEN}{bcolors.BOLD}{classGrade}{bcolors.ENDC}")
             print()
+            if len(missingAssignments) > 0:
+                 print(f"Missing assignments: \n{missingAssignmentsLine}")
+                 print("")
+                 file1.write(f"Missing assignments: {'· '.join(missingAssignments)}")
             print(df)
             print()        
             file1.write(f"{df.to_string()}\n")
@@ -101,10 +127,17 @@ else:
             file1.write("\n")
             file1.write(f"{class_}\nNothing graded yet...")
             file1.write("\n")
-            print(class_)
-            print()
-            print("Nothing graded yet...")
+            file1.write(f"Missing assignments: {'· '.join(missingAssignments)}")
+            file1.write("\n")
+            print(f"{classLine}")
+            print(f"Missing assignments: \n{missingAssignmentsLine}")
+            print("")
+            print(f"Nothing graded yet...") 
             print()
             file1.write("\n")
+
+        print()
+        print()
+        print()
         
     file1.close()
