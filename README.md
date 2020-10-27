@@ -8,5 +8,11 @@
 4. Wait for all the packages to download
 5. Run the script
 
-There will be a file created will all the assignments that have been graded. (grades.txt)
+---
+
+## To run the program automatically open Gradescope.sh in Terminal
+
+---
+
+There will be a file created will all the assignments that have been graded. (report.txt)
 

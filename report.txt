@@ -1,19 +1,35 @@
-Grade report 2020-10-12
+Grade report 2020-10-27
 
 CS 1.1
-Grade: 95
-          assignment        score
-0  The Flower Garden  21.0 / 24.0
-1             Quiz 1  21.0 / 21.0
-2             Quiz 2  25.0 / 25.0
+Grade: 91
+              assignment        score
+0      The Flower Garden  21.0 / 24.0
+1                 Quiz 1  21.0 / 21.0
+2  Superhero Team Dueler   8.0 / 10.0
+3                 Quiz 2  25.0 / 25.0
+
+
+CS 1.2
+Nothing graded yet...
+Missing assignments: 
 
 
 INT 1.1
 Nothing graded yet...
-Missing assignments: Proposal · Github
+Missing assignments: 
 
 
-WEB 1.0
+QL1.1
+Nothing graded yet...
+Missing assignments: 
+
+
+SPD 1.2
+Nothing graded yet...
+Missing assignments: 
+
+
+Archived - WEB 1.0 (Term 1)
 Grade: 91
                            assignment      score
 0             Portfolio Part 1 (HTML)  9.0 / 9.0
