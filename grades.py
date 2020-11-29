@@ -59,7 +59,8 @@ else:
     clases = dict()
     grades = {}
     missingAssignments = []
-
+    data = []
+    dataAssignments = []
     file1 = open("report.txt","w")
 
     for a in soup.find_all('a', href=True):
@@ -71,6 +72,7 @@ else:
     file1.write(f"Grade report {str(date.today())}")
     file1.write("\n")
     for class_ in clases:
+        dataAssignments = []
         br.open("https://www.gradescope.com" + clases[class_])
         soup = BeautifulSoup(br.response().read(), features="html5lib")
         score = soup.find_all("div", class_="submissionStatus--score")
@@ -86,6 +88,7 @@ else:
                     missingAssignments.append(a.text)
             if grade is not None:
                 assignment = tr.find("a")
+                dataAssignments.append(assignment.text + " - " + grade.text)
                 try:
                     grades[class_].update({assignment.text:grade.text})
                 except KeyError:
@@ -107,6 +110,8 @@ else:
                 num += 1
         missingAssignmentsLine = bcolors.FAIL + "  - " +  '\n  - '.join(missingAssignments) + bcolors.ENDC
         classLine =  bcolors.HEADER  + "     " + class_ + "     " + bcolors.ENDC  + "\n"
+        
+        
         try:
             df = pd.DataFrame(grades[class_].items(), columns=["assignment", "score"])
             classGrade = int(average/num)
@@ -123,6 +128,15 @@ else:
             print()        
             file1.write(f"{df.to_string()}\n")
             file1.write("\n")
+            data.append(
+            {
+                "class":class_,
+                "assignments": dataAssignments,
+                "missing": missingAssignments,
+                "grade": classGrade,
+                "link": "https://www.gradescope.com" + clases[class_],
+            }
+        )
         except KeyError:
             file1.write("\n")
             file1.write(f"{class_}\nNothing graded yet...")
@@ -135,9 +149,19 @@ else:
             print(f"Nothing graded yet...") 
             print()
             file1.write("\n")
+            data.append(
+            {
+                "class":class_,
+                "assignments": dataAssignments,
+                "missing": missingAssignments,
+                "grade": 0,
+                "link": "https://www.gradescope.com" + clases[class_],
+            }
+        )
 
         print()
         print()
         print()
+    print(data)
         
     file1.close()
