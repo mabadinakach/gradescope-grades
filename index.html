@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPD Project</title>
+    <link rel='stylesheet' href='style.css'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <!-- <meta name="google-signin-client_id" content="511012749536-q5qgta671hu4r717a6fcthlqj4h3l9h4.apps.googleusercontent.com">
+        <script src="https://apis.google.com/js/platform.js" async defer></script> -->
+</head>
+<body>
+    <!-- Image and text -->
+    
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            Gradescope Tool
+        </a>
+        <button id="authorize_button" style="display: none;">Authorize</button>
+        <button id="signout_button" style="display: none;">Sign Out</button>
+        
+        <pre id="content" style="white-space: pre-wrap;"></pre>
+        <!-- <div class="g-signin2" data-onsuccess="onSignIn"></div>
+            <button onclick="signOut()">Sign out</button> -->
+    </nav>
+        
+    <main class='items' id='items'>
+    </main>
+    <script>
+
+        function appendPre(message) {
+            var pre = document.getElementById('content');
+            var textContent = document.createTextNode(message + '\n');
+            pre.appendChild(textContent);
+        }
+        function onSignIn(googleUser) {
+            // get user profile information
+            
+            console.log(googleUser.getBasicProfile())
+        }
+        function signOut() {
+            gapi.auth2.getAuthInstance().signOut().then(function() {
+                console.log('user signed out')
+            })
+        }
+
+            
+
+            
+            
+    </script>
+            
+            
+    <script>
+
+        var CLIENT_ID = '486906308520-7gapsff55hia8hj8kvgk3mdctjojtilo.apps.googleusercontent.com';
+        var API_KEY = 'AIzaSyChNbkCvbk2KBayw2nzgaz-bW5BveZOsO4';
+
+        // Array of API discovery doc URLs for APIs used by the quickstart
+        var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+
+        // Authorization scopes required by the API; multiple scopes can be
+        // included, separated by spaces.
+        var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+
+        var authorizeButton = document.getElementById('authorize_button');
+        var signoutButton = document.getElementById('signout_button');
+        // Client ID and API key from the Developer Console
+        function handleClientLoad() {
+            gapi.load('client:auth2', initClient);
+        }
+
+        /**
+        *  Initializes the API client library and sets up sign-in state
+        *  listeners.
+        */
+        function initClient() {
+            gapi.client.init({
+                apiKey: API_KEY,
+                clientId: CLIENT_ID,
+                discoveryDocs: DISCOVERY_DOCS,
+                scope: SCOPES
+            }).then(function () {
+                // Listen for sign-in state changes.
+                gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+                
+                // Handle the initial sign-in state.
+                updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+                authorizeButton.onclick = handleAuthClick;
+                signoutButton.onclick = handleSignoutClick;
+            }, function(error) {
+                appendPre(JSON.stringify(error, null, 2));
+            });
+        }
+
+        /**
+        *  Called when the signed in status changes, to update the UI
+        *  appropriately. After a sign-in, the API is called.
+        */
+        function updateSigninStatus(isSignedIn) {
+            if (isSignedIn) {
+                authorizeButton.style.display = 'none';
+                signoutButton.style.display = 'block';
+                //listUpcomingEvents();
+            } else {
+                authorizeButton.style.display = 'block';
+                signoutButton.style.display = 'none';
+            }
+        }
+
+        function handleAuthClick(event) {
+            gapi.auth2.getAuthInstance().signIn();
+        }
+
+        /**
+         *  Sign out the user upon button click.
+         */
+        function handleSignoutClick(event) {
+            gapi.auth2.getAuthInstance().signOut();
+        }
+        
+        
+    </script>
+    <script async defer src="https://apis.google.com/js/api.js"
+    onload="this.onload=function(){};handleClientLoad()"
+    onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+    <script src='script.js' type="module"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+</body>
+</html>

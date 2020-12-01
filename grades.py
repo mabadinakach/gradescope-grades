@@ -4,7 +4,12 @@ import mechanize
 import pandas as pd
 import getpass
 import keyring
+import os
+import subprocess
+import webbrowser
 from datetime import date
+import datetime
+now = datetime.datetime.now()
 
 class bcolors:
     HEADER = '\033[44m'
@@ -61,7 +66,9 @@ else:
     missingAssignments = []
     data = []
     dataAssignments = []
+    testAssignments = []
     file1 = open("report.txt","w")
+    jsFile = open("data.js","w")
 
     for a in soup.find_all('a', href=True):
         h3 = a.find_all('h3', class_="courseBox--shortname")
@@ -73,6 +80,7 @@ else:
     file1.write("\n")
     for class_ in clases:
         dataAssignments = []
+        testAssignments = []
         br.open("https://www.gradescope.com" + clases[class_])
         soup = BeautifulSoup(br.response().read(), features="html5lib")
         score = soup.find_all("div", class_="submissionStatus--score")
@@ -82,13 +90,16 @@ else:
         for tr in soup.find_all("tr"):
             grade = tr.find("div", class_="submissionStatus--score")
             work = tr.find("div", class_="submissionStatus--text")
+            date = tr.find('span', class_="submissionTimeChart--dueDate")
             if work is not None:
                 if work.text == "No Submission":
                     a = tr.find("a")
                     missingAssignments.append(a.text)
+                    testAssignments.append({a.text:date.text[:6]+" "+str(now.year)})
             if grade is not None:
                 assignment = tr.find("a")
                 dataAssignments.append(assignment.text + " - " + grade.text)
+                #testAssignments.append({assignment.text:date.text[:6]+" "+str(now.year)})
                 try:
                     grades[class_].update({assignment.text:grade.text})
                 except KeyError:
@@ -115,53 +126,61 @@ else:
         try:
             df = pd.DataFrame(grades[class_].items(), columns=["assignment", "score"])
             classGrade = int(average/num)
-            file1.write("\n")
-            file1.write(f"{class_}\nGrade: {classGrade}")
-            file1.write("\n")
-            print(f"{classLine}\nGrade: {bcolors.OKGREEN}{bcolors.BOLD}{classGrade}{bcolors.ENDC}")
-            print()
+            #file1.write("\n")
+            #file1.write(f"{class_}\nGrade: {classGrade}")
+            #file1.write("\n")
+            #print(f"{classLine}\nGrade: {bcolors.OKGREEN}{bcolors.BOLD}{classGrade}{bcolors.ENDC}")
+            #print()
             if len(missingAssignments) > 0:
-                 print(f"Missing assignments: \n{missingAssignmentsLine}")
-                 print("")
-                 file1.write(f"Missing assignments: {'· '.join(missingAssignments)}")
-            print(df)
-            print()        
-            file1.write(f"{df.to_string()}\n")
-            file1.write("\n")
+                pass
+                 #print(f"Missing assignments: \n{missingAssignmentsLine}")
+                 #print("")
+                 #file1.write(f"Missing assignments: {'· '.join(missingAssignments)}")
+            #print(df)
+            #print()        
+            #file1.write(f"{df.to_string()}\n")
+            #file1.write("\n")
             data.append(
             {
                 "class":class_,
                 "assignments": dataAssignments,
                 "missing": missingAssignments,
                 "grade": classGrade,
+                "dates":testAssignments,
                 "link": "https://www.gradescope.com" + clases[class_],
             }
         )
         except KeyError:
-            file1.write("\n")
-            file1.write(f"{class_}\nNothing graded yet...")
-            file1.write("\n")
-            file1.write(f"Missing assignments: {'· '.join(missingAssignments)}")
-            file1.write("\n")
-            print(f"{classLine}")
-            print(f"Missing assignments: \n{missingAssignmentsLine}")
-            print("")
-            print(f"Nothing graded yet...") 
-            print()
-            file1.write("\n")
+            #file1.write("\n")
+            #file1.write(f"{class_}\nNothing graded yet...")
+            #file1.write("\n")
+            #file1.write(f"Missing assignments: {'· '.join(missingAssignments)}")
+            #file1.write("\n")
+            #print(f"{classLine}")
+            #print(f"Missing assignments: \n{missingAssignmentsLine}")
+            #print("")
+            #print(f"Nothing graded yet...") 
+            #print()
+            #file1.write("\n")
             data.append(
             {
                 "class":class_,
                 "assignments": dataAssignments,
                 "missing": missingAssignments,
                 "grade": 0,
+                "dates":[],
                 "link": "https://www.gradescope.com" + clases[class_],
             }
         )
 
-        print()
-        print()
-        print()
-    print(data)
+        #print()
+        #print()
+        #print()
+    jsFile.write(f"const data = {data}")
+    jsFile.write("\n" )
+    jsFile.write("export default data;")
+    jsFile.close()
         
     file1.close()
+    #subprocess.Popen(['python', '-m', 'http.server', '8000'])
+    #webbrowser.open_new_tab('google.com')
